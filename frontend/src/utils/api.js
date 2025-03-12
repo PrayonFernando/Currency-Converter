@@ -1,13 +1,10 @@
-// frontend/src/utils/api.js
-
-const API_URL = "https://backend-zeta-five-62.vercel.app"; // Ensure this is correct
+const API_URL = "http://localhost:5000"; // Change this after deployment
 
 export const fetchTransfers = async () => {
   try {
     const response = await fetch(`${API_URL}/api/transfers`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
-      credentials: "include",
     });
     return await response.json();
   } catch (error) {
@@ -22,7 +19,6 @@ export const createTransfer = async (transferData) => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(transferData),
-      credentials: "include",
     });
     return await response.json();
   } catch (error) {

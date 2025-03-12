@@ -2,35 +2,37 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
-
-const transfersRouter = require("../routes/transfers"); // ✅ Load API routes
+const transfersRouter = require("../routes/transfers");
 const app = express();
 
-// ✅ Fix CORS
+// ✅ Enable CORS for development (Allow frontend requests)
 app.use(
   cors({
-    origin: "*", // Allow all origins temporarily
-    methods: ["GET", "POST", "DELETE"],
+    origin: "*", // Change to frontend URL after testing
+    methods: ["GET", "POST", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type"],
   })
 );
 
-// ✅ Handle preflight requests
+// ✅ Handle OPTIONS preflight requests
 app.options("*", cors());
 
 app.use(express.json());
 
-// ✅ Set API Routes
+// ✅ API Route (Must match frontend requests)
 app.use("/api/transfers", transfersRouter);
 
-// ✅ MongoDB Connection
+// ✅ Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+  .then(() => console.log(" Connected to MongoDB"))
+  .catch((err) => console.error(" MongoDB Connection Error:", err));
 
-// ✅ Export Express App for Vercel
+// ✅ Start Local Server (Comment this when deploying to Vercel)
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
 module.exports = app;
