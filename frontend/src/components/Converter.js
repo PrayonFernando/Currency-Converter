@@ -1,12 +1,13 @@
 // frontend/src/components/Converter.js
 import React, { useState } from "react";
 import { TextField, Button, MenuItem, Box, Typography } from "@mui/material";
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 
 const countries = [
-  { name: "USA", currency: "USD" },
-  { name: "Sri Lanka", currency: "LKR" },
-  { name: "Australia", currency: "AUD" },
-  { name: "India", currency: "INR" },
+  { name: "USA", currency: "USD", flagUrl: "https://flagcdn.com/us.svg" },
+  { name: "Sri Lanka", currency: "LKR", flagUrl: "https://flagcdn.com/lk.svg" },
+  { name: "Australia", currency: "AUD", flagUrl: "https://flagcdn.com/au.svg" },
+  { name: "India", currency: "INR", flagUrl: "https://flagcdn.com/in.svg" },
 ];
 
 const Converter = ({ onTransferCreated }) => {
@@ -15,9 +16,9 @@ const Converter = ({ onTransferCreated }) => {
   const [amount, setAmount] = useState("");
   const [convertedAmount, setConvertedAmount] = useState(null);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleTransfer = async () => {
-    // Retrieve currency codes for the selected countries
     const from = countries.find((c) => c.name === fromCountry);
     const to = countries.find((c) => c.name === toCountry);
 
@@ -26,6 +27,7 @@ const Converter = ({ onTransferCreated }) => {
       return;
     }
 
+    setLoading(true);
     const payload = {
       fromCountry,
       toCountry,
@@ -47,6 +49,8 @@ const Converter = ({ onTransferCreated }) => {
     } catch (err) {
       setError("Transfer failed. Please try again.");
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -65,11 +69,17 @@ const Converter = ({ onTransferCreated }) => {
       >
         {countries.map((option) => (
           <MenuItem key={option.name} value={option.name}>
+            <img
+              src={option.flagUrl}
+              alt={`${option.name} flag`}
+              style={{ width: 24, marginRight: 8 }}
+            />
             {option.name}
           </MenuItem>
         ))}
       </TextField>
       <TextField
+        // sx={{ borderRadius: "2rem" }}
         select
         label="To Country"
         value={toCountry}
@@ -79,6 +89,11 @@ const Converter = ({ onTransferCreated }) => {
       >
         {countries.map((option) => (
           <MenuItem key={option.name} value={option.name}>
+            <img
+              src={option.flagUrl}
+              alt={`${option.name} flag`}
+              style={{ width: 24, marginRight: 8 }}
+            />
             {option.name}
           </MenuItem>
         ))}
@@ -90,7 +105,7 @@ const Converter = ({ onTransferCreated }) => {
         fullWidth
         margin="normal"
       />
-      {typeof convertedAmount === "number" && (
+      {convertedAmount !== null && typeof convertedAmount === "number" && (
         <Typography variant="body1" sx={{ mt: 2 }}>
           Converted Amount: {convertedAmount.toFixed(2)}
         </Typography>
@@ -102,12 +117,39 @@ const Converter = ({ onTransferCreated }) => {
       )}
       <Button
         variant="contained"
-        color="primary"
-        sx={{ mt: 2 }}
+        sx={{
+          mt: 2,
+          display: "block",
+          margin: "0 auto",
+          borderRadius: "2rem",
+          padding: "10px 20px",
+          fontWeight: "bold",
+          transition: "all 0.3s ease",
+          background: "linear-gradient(45deg, #FE6B8B, #FF8E53)",
+          "&:hover": {
+            background: "linear-gradient(45deg, #FF8E53, #FE6B8B)",
+            transform: "scale(1.05)",
+          },
+        }}
         onClick={handleTransfer}
+        disabled={loading}
       >
-        Transfer
+        {loading ? (
+          <MonetizationOnIcon
+            sx={{
+              animation: "spin 1s linear infinite",
+            }}
+          />
+        ) : (
+          "Transfer"
+        )}
       </Button>
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </Box>
   );
 };

@@ -44,7 +44,7 @@ const TransferHistory = ({ transfers, onTransferDeleted }) => {
 
   return (
     <Box>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
         Transfer History
       </Typography>
       <List>
