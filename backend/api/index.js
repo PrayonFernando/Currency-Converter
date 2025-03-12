@@ -6,24 +6,14 @@ require("dotenv").config();
 const transfersRouter = require("../routes/transfers");
 const app = express();
 
-// ✅ Fix: Allow CORS for your frontend
-const allowedOrigins = [
-  "http://localhost:3000", // Local development
-  "https://frontend-sigma-flame-32.vercel.app/", // Replace with your actual deployed frontend URL
-];
-
-app.use(
-  cors({
-    origin: "*", // Temporarily allow all origins
-    methods: ["GET", "POST", "DELETE"],
-    allowedHeaders: ["Content-Type"],
-  })
-);
+// ✅ Fix CORS (Allow all origins temporarily for debugging)
+app.use(cors());
+app.options("*", cors()); // Handle preflight requests
 
 app.use(express.json());
 app.use("/api/transfers", transfersRouter);
 
-// MongoDB Connection
+// ✅ MongoDB Connection
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -32,4 +22,5 @@ mongoose
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
+// ✅ Export the Express App (Required for Vercel)
 module.exports = app;
