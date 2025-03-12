@@ -10,13 +10,16 @@ import {
   getCurrencyName,
   numberToWords,
 } from "../utils/helpers";
+import { createTransfer, fetchTransfers, deleteTransfer } from "../utils/api";
 
+// Set up theme with Whyte Inktrap font
 const theme = createTheme({
   typography: {
     fontFamily: "Whyte Inktrap, sans-serif",
   },
 });
 
+// Define available countries with flags
 const countries = [
   { name: "USA", currency: "USD", flagUrl: "https://flagcdn.com/us.svg" },
   { name: "Sri Lanka", currency: "LKR", flagUrl: "https://flagcdn.com/lk.svg" },
@@ -25,33 +28,34 @@ const countries = [
 ];
 
 export default function CurrencyConverterApp() {
+  // State variables
   const [fromCountry, setFromCountry] = useState("USD");
   const [toCountry, setToCountry] = useState("LKR");
   const [amount, setAmount] = useState("");
   const [convertedAmount, setConvertedAmount] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const [transfers, setTransfers] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
-
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
 
+  // Fetch transfer history on component mount
   useEffect(() => {
-    fetchTransfers();
+    loadTransfers();
   }, []);
 
-  const fetchTransfers = async () => {
+  // Function to fetch transaction history
+  const loadTransfers = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/transfers");
-      const data = await response.json();
+      const data = await fetchTransfers();
       setTransfers(data);
     } catch (error) {
       console.error("Error fetching transfers:", error);
     }
   };
 
+  // Handle currency conversion and save the transaction
   const handleTransfer = async () => {
     const from = countries.find((c) => c.currency === fromCountry);
     const to = countries.find((c) => c.currency === toCountry);
@@ -72,14 +76,13 @@ export default function CurrencyConverterApp() {
     };
 
     try {
-      const response = await fetch("http://localhost:5000/api/transfers", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await response.json();
-      setConvertedAmount(data.convertedAmount);
-      await fetchTransfers();
+      const data = await createTransfer(payload);
+      if (data) {
+        setConvertedAmount(data.convertedAmount);
+        await loadTransfers(); // Refresh transaction history
+      } else {
+        setError("Transfer failed. Please try again.");
+      }
     } catch (err) {
       console.error(err);
       setError("Transfer failed. Please try again.");
@@ -88,22 +91,24 @@ export default function CurrencyConverterApp() {
     }
   };
 
+  // Open delete confirmation modal
   const handleOpenDeleteModal = (id) => {
     setDeleteId(id);
     setDeleteModalOpen(true);
   };
 
+  // Close delete confirmation modal
   const handleCloseDeleteModal = () => {
     setDeleteId(null);
     setDeleteModalOpen(false);
   };
 
+  // Confirm and execute delete action
   const confirmDelete = async () => {
+    if (!deleteId) return;
     try {
-      await fetch(`http://localhost:5000/api/transfers/${deleteId}`, {
-        method: "DELETE",
-      });
-      await fetchTransfers();
+      await deleteTransfer(deleteId);
+      await loadTransfers(); // Refresh transaction history
     } catch (err) {
       console.error("Error deleting transfer:", err);
     } finally {
@@ -112,13 +117,16 @@ export default function CurrencyConverterApp() {
     }
   };
 
+  // Toggle transaction history visibility
   const toggleHistory = () => {
     setShowHistory(!showHistory);
   };
 
+  // Get selected country objects
   const fromCurrencyObj = countries.find((c) => c.currency === fromCountry);
   const toCurrencyObj = countries.find((c) => c.currency === toCountry);
 
+  // Calculate exchange rate (per unit conversion)
   const exchangeRate =
     amount && !isNaN(amount) && convertedAmount !== null
       ? convertedAmount / parseFloat(amount)
@@ -127,13 +135,16 @@ export default function CurrencyConverterApp() {
   return (
     <ThemeProvider theme={theme}>
       <Box sx={{ backgroundColor: "#f8f8f8", minHeight: "100vh" }}>
+        {/* Header Section */}
         <HeaderSection
           fromCurrencyObj={fromCurrencyObj}
           toCurrencyObj={toCurrencyObj}
           amount={amount}
           convertedAmount={convertedAmount}
         />
+
         <Container maxWidth="md" sx={{ mt: { xs: -12, md: -16 } }}>
+          {/* Conversion Card */}
           <ConversionCard
             fromCountry={fromCountry}
             toCountry={toCountry}
@@ -150,6 +161,8 @@ export default function CurrencyConverterApp() {
             toggleHistory={toggleHistory}
             showHistory={showHistory}
           />
+
+          {/* Transaction History Section */}
           {showHistory && (
             <TransactionHistorySection
               transfers={transfers}
@@ -157,11 +170,15 @@ export default function CurrencyConverterApp() {
             />
           )}
         </Container>
+
+        {/* Delete Confirmation Dialog */}
         <DeleteConfirmationDialog
           deleteModalOpen={deleteModalOpen}
           handleCloseDeleteModal={handleCloseDeleteModal}
           confirmDelete={confirmDelete}
         />
+
+        {/* Spin animation for loading icon */}
         <style>{`
           @keyframes spin {
             0% { transform: rotate(0deg); }
