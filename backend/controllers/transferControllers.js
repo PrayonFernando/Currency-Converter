@@ -13,7 +13,6 @@ exports.getTransfers = async (req, res) => {
 exports.createTransfer = async (req, res) => {
   const { fromCountry, toCountry, fromCurrency, toCurrency, amount } = req.body;
   try {
-    // Fetch conversion rate and compute converted amount
     const convertedAmount = await convertCurrency(
       fromCurrency,
       toCurrency,

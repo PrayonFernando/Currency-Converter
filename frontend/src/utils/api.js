@@ -1,5 +1,5 @@
 const API_URL =
-  process.env.REACT_APP_API_URL || "https://backend-sepia-eight-78.vercel.app/"; // Replace with your actual backend URL
+  process.env.REACT_APP_API_URL || "https://backend-sepia-eight-78.vercel.app/";
 
 export const fetchTransfers = async () => {
   try {

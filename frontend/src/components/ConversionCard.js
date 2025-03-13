@@ -168,7 +168,7 @@ export default function ConversionCard({
           </Button>
         </Box>
       )}
-      {/* error message if no amount was entered*/}
+
       {error && (
         <Typography variant="body2" color="error" sx={{ mb: 2 }}>
           {error}

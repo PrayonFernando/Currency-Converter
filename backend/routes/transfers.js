@@ -3,7 +3,6 @@ const Transfer = require("../models/Transfer");
 const { convertCurrency } = require("../utils/currencyConverter");
 const router = express.Router();
 
-// ✅ GET: Fetch all transfers
 router.get("/", async (req, res) => {
   try {
     const transfers = await Transfer.find().sort({ date: -1 });
@@ -14,7 +13,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ✅ POST: Create new transfer
 router.post("/", async (req, res) => {
   try {
     const { fromCurrency, toCurrency, amount } = req.body;
@@ -37,7 +35,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-// ✅ DELETE: Remove a transfer
 router.delete("/:id", async (req, res) => {
   try {
     const transfer = await Transfer.findByIdAndDelete(req.params.id);
