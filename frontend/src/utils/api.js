@@ -1,11 +1,9 @@
-const API_URL = "http://localhost:5000"; // Change this after deployment
+const API_URL =
+  process.env.REACT_APP_API_URL || "https://backend-sepia-eight-78.vercel.app/"; // Replace with your actual backend URL
 
 export const fetchTransfers = async () => {
   try {
-    const response = await fetch(`${API_URL}/api/transfers`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
+    const response = await fetch(`${API_URL}/api/transfers`);
     return await response.json();
   } catch (error) {
     console.error("Error fetching transfers:", error);
@@ -29,7 +27,9 @@ export const createTransfer = async (transferData) => {
 
 export const deleteTransfer = async (id) => {
   try {
-    await fetch(`${API_URL}/api/transfers/${id}`, { method: "DELETE" });
+    await fetch(`${API_URL}/api/transfers/${id}`, {
+      method: "DELETE",
+    });
   } catch (error) {
     console.error("Error deleting transfer:", error);
   }
