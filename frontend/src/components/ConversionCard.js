@@ -141,7 +141,7 @@ export default function ConversionCard({
             mb: 2,
           }}
         >
-          <Typography variant="h6" fontWeight="bold" sx={{ color: "#000" }}>
+          <Typography variant="h6" fontWeight="bold" sx={{ color: "#a6a6a6" }}>
             1 {fromCurrencyObj?.currency} →{" "}
             {getCurrencySymbol(toCurrencyObj?.currency)}
             {exchangeRate.toFixed(2)} {toCurrencyObj?.currency}

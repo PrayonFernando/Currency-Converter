@@ -7,7 +7,10 @@ export default function TransactionHistorySection({
   handleOpenDeleteModal,
 }) {
   return (
-    <Paper sx={{ mt: 2, p: 2, borderRadius: 2 }} elevation={2}>
+    <Paper
+      sx={{ mt: 2, p: 2, borderRadius: 2, width: "100%", ml: 1 }}
+      elevation={2}
+    >
       <Typography variant="h6" fontWeight="bold" mb={2}>
         Transaction History
       </Typography>
